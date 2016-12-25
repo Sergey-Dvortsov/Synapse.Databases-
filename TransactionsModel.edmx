@@ -1,0 +1,358 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="Хранилище TransactionsModel" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="TOrders">
+          <Key>
+            <PropertyRef Name="OrderId" />
+          </Key>
+          <Property Name="OrderId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TransactionId" Type="bigint" Nullable="false" />
+          <Property Name="ExchOrderId" Type="bigint" Nullable="false" />
+          <Property Name="Time" Type="datetime" Nullable="false" />
+          <Property Name="ChangeTime" Type="datetime" Nullable="false" />
+          <Property Name="Price" Type="money" Nullable="false" />
+          <Property Name="Volume" Type="int" Nullable="false" />
+          <Property Name="Balance" Type="int" Nullable="false" />
+          <Property Name="State" Type="char" MaxLength="1" Nullable="false" />
+          <Property Name="Type" Type="char" MaxLength="1" Nullable="false" />
+          <Property Name="Side" Type="char" MaxLength="1" Nullable="false" />
+          <Property Name="Canceled" Type="bit" Nullable="false" />
+          <Property Name="Portfolio" Type="nchar" MaxLength="20" Nullable="false" />
+          <Property Name="Security" Type="nchar" MaxLength="30" Nullable="false" />
+          <Property Name="CancelLatency" Type="time" Precision="7" />
+          <Property Name="RegisterLatency" Type="time" Precision="7" />
+          <Property Name="StrategyId" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="TStrategies">
+          <Key>
+            <PropertyRef Name="StrategyId" />
+          </Key>
+          <Property Name="StrategyId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nchar" MaxLength="20" Nullable="false" />
+          <Property Name="GUID" Type="uniqueidentifier" Nullable="false" />
+          <Property Name="CreationTime " Type="datetime" />
+          <Property Name="ParentId" Type="int" />
+        </EntityType>
+        <EntityType Name="TSubtotals">
+          <Key>
+            <PropertyRef Name="SubtotalId" />
+          </Key>
+          <Property Name="SubtotalId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Time" Type="datetime" Nullable="false" />
+          <Property Name="StrategyId" Type="int" Nullable="false" />
+          <Property Name="RealizedPnl" Type="money" Nullable="false" />
+          <Property Name="Position" Type="int" Nullable="false" />
+          <Property Name="Price" Type="money" />
+        </EntityType>
+        <EntityType Name="TTrades">
+          <Key>
+            <PropertyRef Name="TradeId" />
+          </Key>
+          <Property Name="TradeId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ExchTradeId" Type="bigint" Nullable="false" />
+          <Property Name="Time" Type="datetime" Nullable="false" />
+          <Property Name="Price" Type="money" Nullable="false" />
+          <Property Name="Volume" Type="int" Nullable="false" />
+          <Property Name="Side" Type="char" MaxLength="1" Nullable="false" />
+          <Property Name="OrderId" Type="int" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_Orders_ToStrategies">
+          <End Role="TStrategies" Type="Self.TStrategies" Multiplicity="1" />
+          <End Role="TOrders" Type="Self.TOrders" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TStrategies">
+              <PropertyRef Name="StrategyId" />
+            </Principal>
+            <Dependent Role="TOrders">
+              <PropertyRef Name="StrategyId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Subtotals_ToStrategies">
+          <End Role="TStrategies" Type="Self.TStrategies" Multiplicity="1" />
+          <End Role="TSubtotals" Type="Self.TSubtotals" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TStrategies">
+              <PropertyRef Name="StrategyId" />
+            </Principal>
+            <Dependent Role="TSubtotals">
+              <PropertyRef Name="StrategyId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Trades_ToOrders">
+          <End Role="TOrders" Type="Self.TOrders" Multiplicity="1" />
+          <End Role="TTrades" Type="Self.TTrades" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TOrders">
+              <PropertyRef Name="OrderId" />
+            </Principal>
+            <Dependent Role="TTrades">
+              <PropertyRef Name="OrderId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_TStrategies_ToTStrategies">
+          <End Role="TStrategies" Type="Self.TStrategies" Multiplicity="0..1" />
+          <End Role="TStrategies1" Type="Self.TStrategies" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TStrategies">
+              <PropertyRef Name="StrategyId" />
+            </Principal>
+            <Dependent Role="TStrategies1">
+              <PropertyRef Name="ParentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="Хранилище TransactionsModelContainer">
+          <EntitySet Name="TOrders" EntityType="Self.TOrders" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="TStrategies" EntityType="Self.TStrategies" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="TSubtotals" EntityType="Self.TSubtotals" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="TTrades" EntityType="Self.TTrades" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_Orders_ToStrategies" Association="Self.FK_Orders_ToStrategies">
+            <End Role="TStrategies" EntitySet="TStrategies" />
+            <End Role="TOrders" EntitySet="TOrders" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Subtotals_ToStrategies" Association="Self.FK_Subtotals_ToStrategies">
+            <End Role="TStrategies" EntitySet="TStrategies" />
+            <End Role="TSubtotals" EntitySet="TSubtotals" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Trades_ToOrders" Association="Self.FK_Trades_ToOrders">
+            <End Role="TOrders" EntitySet="TOrders" />
+            <End Role="TTrades" EntitySet="TTrades" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TStrategies_ToTStrategies" Association="Self.FK_TStrategies_ToTStrategies">
+            <End Role="TStrategies" EntitySet="TStrategies" />
+            <End Role="TStrategies1" EntitySet="TStrategies" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="TransactionsModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="TOrder">
+          <Key>
+            <PropertyRef Name="OrderId" />
+          </Key>
+          <Property Name="OrderId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TransactionId" Type="Int64" Nullable="false" />
+          <Property Name="ExchOrderId" Type="Int64" Nullable="false" />
+          <Property Name="Time" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ChangeTime" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Price" Type="Decimal" Precision="19" Scale="4" Nullable="false" />
+          <Property Name="Volume" Type="Int32" Nullable="false" />
+          <Property Name="Balance" Type="Int32" Nullable="false" />
+          <Property Name="State" Type="String" MaxLength="1" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="Type" Type="String" MaxLength="1" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="Side" Type="String" MaxLength="1" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="Canceled" Type="Boolean" Nullable="false" />
+          <Property Name="Portfolio" Type="String" MaxLength="20" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="Security" Type="String" MaxLength="30" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="CancelLatency" Type="Time" Precision="7" />
+          <Property Name="RegisterLatency" Type="Time" Precision="7" />
+          <Property Name="StrategyId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="TStrategy" Relationship="Self.FK_Orders_ToStrategies" FromRole="TOrders" ToRole="TStrategies" />
+          <NavigationProperty Name="TTrades" Relationship="Self.FK_Trades_ToOrders" FromRole="TOrders" ToRole="TTrades" />
+        </EntityType>
+        <EntityType Name="TStrategy">
+          <Key>
+            <PropertyRef Name="StrategyId" />
+          </Key>
+          <Property Name="StrategyId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="20" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="GUID" Type="Guid" Nullable="false" />
+          <Property Name="CreationTime_" Type="DateTime" Precision="3" />
+          <Property Name="ParentId" Type="Int32" />
+          <NavigationProperty Name="TOrders" Relationship="Self.FK_Orders_ToStrategies" FromRole="TStrategies" ToRole="TOrders" />
+          <NavigationProperty Name="TSubtotals" Relationship="Self.FK_Subtotals_ToStrategies" FromRole="TStrategies" ToRole="TSubtotals" />
+          <NavigationProperty Name="TStrategies1" Relationship="TransactionsModel.FK_TStrategies_ToTStrategies" FromRole="TStrategy" ToRole="TStrategy1" />
+          <NavigationProperty Name="TStrategy1" Relationship="TransactionsModel.FK_TStrategies_ToTStrategies" FromRole="TStrategy1" ToRole="TStrategy" />
+        </EntityType>
+        <EntityType Name="TSubtotal">
+          <Key>
+            <PropertyRef Name="SubtotalId" />
+          </Key>
+          <Property Name="SubtotalId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Time" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="StrategyId" Type="Int32" Nullable="false" />
+          <Property Name="RealizedPnl" Type="Decimal" Precision="19" Scale="4" Nullable="false" />
+          <Property Name="Position" Type="Int32" Nullable="false" />
+          <Property Name="Price" Type="Decimal" Precision="19" Scale="4" />
+          <NavigationProperty Name="TStrategy" Relationship="Self.FK_Subtotals_ToStrategies" FromRole="TSubtotals" ToRole="TStrategies" />
+        </EntityType>
+        <EntityType Name="TTrade">
+          <Key>
+            <PropertyRef Name="TradeId" />
+          </Key>
+          <Property Name="TradeId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ExchTradeId" Type="Int64" Nullable="false" />
+          <Property Name="Time" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Price" Type="Decimal" Precision="19" Scale="4" Nullable="false" />
+          <Property Name="Volume" Type="Int32" Nullable="false" />
+          <Property Name="Side" Type="String" MaxLength="1" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="OrderId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="TOrder" Relationship="Self.FK_Trades_ToOrders" FromRole="TTrades" ToRole="TOrders" />
+        </EntityType>
+        <Association Name="FK_Orders_ToStrategies">
+          <End Role="TStrategies" Type="Self.TStrategy" Multiplicity="1" />
+          <End Role="TOrders" Type="Self.TOrder" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TStrategies">
+              <PropertyRef Name="StrategyId" />
+            </Principal>
+            <Dependent Role="TOrders">
+              <PropertyRef Name="StrategyId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Trades_ToOrders">
+          <End Role="TOrders" Type="Self.TOrder" Multiplicity="1" />
+          <End Role="TTrades" Type="Self.TTrade" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TOrders">
+              <PropertyRef Name="OrderId" />
+            </Principal>
+            <Dependent Role="TTrades">
+              <PropertyRef Name="OrderId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Subtotals_ToStrategies">
+          <End Role="TStrategies" Type="Self.TStrategy" Multiplicity="1" />
+          <End Role="TSubtotals" Type="Self.TSubtotal" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TStrategies">
+              <PropertyRef Name="StrategyId" />
+            </Principal>
+            <Dependent Role="TSubtotals">
+              <PropertyRef Name="StrategyId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="TransactionsEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="TOrders" EntityType="Self.TOrder" />
+          <EntitySet Name="TStrategies" EntityType="Self.TStrategy" />
+          <EntitySet Name="TSubtotals" EntityType="Self.TSubtotal" />
+          <EntitySet Name="TTrades" EntityType="Self.TTrade" />
+          <AssociationSet Name="FK_Orders_ToStrategies" Association="Self.FK_Orders_ToStrategies">
+            <End Role="TStrategies" EntitySet="TStrategies" />
+            <End Role="TOrders" EntitySet="TOrders" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Trades_ToOrders" Association="Self.FK_Trades_ToOrders">
+            <End Role="TOrders" EntitySet="TOrders" />
+            <End Role="TTrades" EntitySet="TTrades" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Subtotals_ToStrategies" Association="Self.FK_Subtotals_ToStrategies">
+            <End Role="TStrategies" EntitySet="TStrategies" />
+            <End Role="TSubtotals" EntitySet="TSubtotals" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TStrategies_ToTStrategies" Association="TransactionsModel.FK_TStrategies_ToTStrategies">
+            <End Role="TStrategy" EntitySet="TStrategies" />
+            <End Role="TStrategy1" EntitySet="TStrategies" />
+          </AssociationSet>
+        </EntityContainer>
+        <Association Name="FK_TStrategies_ToTStrategies">
+          <End Type="TransactionsModel.TStrategy" Role="TStrategy" Multiplicity="0..1" />
+          <End Type="TransactionsModel.TStrategy" Role="TStrategy1" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TStrategy">
+              <PropertyRef Name="StrategyId" />
+            </Principal>
+            <Dependent Role="TStrategy1">
+              <PropertyRef Name="ParentId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="Хранилище TransactionsModelContainer" CdmEntityContainer="TransactionsEntities">
+          <EntitySetMapping Name="TOrders">
+            <EntityTypeMapping TypeName="TransactionsModel.TOrder">
+              <MappingFragment StoreEntitySet="TOrders">
+                <ScalarProperty Name="OrderId" ColumnName="OrderId" />
+                <ScalarProperty Name="TransactionId" ColumnName="TransactionId" />
+                <ScalarProperty Name="ExchOrderId" ColumnName="ExchOrderId" />
+                <ScalarProperty Name="Time" ColumnName="Time" />
+                <ScalarProperty Name="ChangeTime" ColumnName="ChangeTime" />
+                <ScalarProperty Name="Price" ColumnName="Price" />
+                <ScalarProperty Name="Volume" ColumnName="Volume" />
+                <ScalarProperty Name="Balance" ColumnName="Balance" />
+                <ScalarProperty Name="State" ColumnName="State" />
+                <ScalarProperty Name="Type" ColumnName="Type" />
+                <ScalarProperty Name="Side" ColumnName="Side" />
+                <ScalarProperty Name="Canceled" ColumnName="Canceled" />
+                <ScalarProperty Name="Portfolio" ColumnName="Portfolio" />
+                <ScalarProperty Name="Security" ColumnName="Security" />
+                <ScalarProperty Name="CancelLatency" ColumnName="CancelLatency" />
+                <ScalarProperty Name="RegisterLatency" ColumnName="RegisterLatency" />
+                <ScalarProperty Name="StrategyId" ColumnName="StrategyId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TStrategies">
+            <EntityTypeMapping TypeName="TransactionsModel.TStrategy">
+              <MappingFragment StoreEntitySet="TStrategies">
+                <ScalarProperty Name="StrategyId" ColumnName="StrategyId" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="GUID" ColumnName="GUID" />
+                <ScalarProperty Name="CreationTime_" ColumnName="CreationTime " />
+                <ScalarProperty Name="ParentId" ColumnName="ParentId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TSubtotals">
+            <EntityTypeMapping TypeName="TransactionsModel.TSubtotal">
+              <MappingFragment StoreEntitySet="TSubtotals">
+                <ScalarProperty Name="SubtotalId" ColumnName="SubtotalId" />
+                <ScalarProperty Name="Time" ColumnName="Time" />
+                <ScalarProperty Name="StrategyId" ColumnName="StrategyId" />
+                <ScalarProperty Name="RealizedPnl" ColumnName="RealizedPnl" />
+                <ScalarProperty Name="Position" ColumnName="Position" />
+                <ScalarProperty Name="Price" ColumnName="Price" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TTrades">
+            <EntityTypeMapping TypeName="TransactionsModel.TTrade">
+              <MappingFragment StoreEntitySet="TTrades">
+                <ScalarProperty Name="TradeId" ColumnName="TradeId" />
+                <ScalarProperty Name="ExchTradeId" ColumnName="ExchTradeId" />
+                <ScalarProperty Name="Time" ColumnName="Time" />
+                <ScalarProperty Name="Price" ColumnName="Price" />
+                <ScalarProperty Name="Volume" ColumnName="Volume" />
+                <ScalarProperty Name="Side" ColumnName="Side" />
+                <ScalarProperty Name="OrderId" ColumnName="OrderId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Нет" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
